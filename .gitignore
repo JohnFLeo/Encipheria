@@ -167,6 +167,7 @@ CMakeUserPresets.json
 # External projects
 *-prefix/
 
+KeyData/*
 
 
 # End of https://www.toptal.com/developers/gitignore/api/clion,c++,cmake
