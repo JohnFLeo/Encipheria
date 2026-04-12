@@ -30,7 +30,7 @@ It IS:
   - Key generation
   - fast Encryption / Decryption
   
-### Phase 3 — Classical Cryptography
+### Phase 3 Classical Cryptography
 - [ ] Vigenère Cipher
 - [ ] Caesar Cipher
 - [ ] etc.
