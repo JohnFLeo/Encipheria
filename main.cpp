@@ -40,9 +40,8 @@ struct sshRsaItem {
     uint32_t length;
     BigInt value;
 };
-/// This is the main entry point
-/// @return error code
-int main() {
+
+int testReadFile() {
     //std::cout << "Try opening id_rsa.pub file.\nThe current path is "<<std::filesystem::current_path() << "!\n";
     std::string fileName =R"(..\KeyData\id_rsa.pub)";
     std::string fileName2 =R"(..\test.txt)";
@@ -57,5 +56,23 @@ int main() {
     }
     std::cout <<"Length of vector: "<< items.size() << std::endl;
     return 0;
+}
+int testBigInt() {
+    auto a = BigInt(UINT64_MAX);
+    auto b = BigInt(20);
+    a.displayHex();
+    b.displayHex();
+    std::cout <<"=====================\n";
+    auto c = a + b;
+    c.display();
+    c.displayHex();
+    return 0;
+}
+
+/// This is the main entry point
+/// @return error code
+int main() {
+    //return testReadFile();
+    testBigInt();
 }
 

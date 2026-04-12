@@ -12,14 +12,17 @@
 class BigInt {
     private:
     std::vector<uint64_t> number;
+    bool isNegative;
+    [[nodiscard]] static std::string uint64ToHex(const uint64_t &number);
     public:
     BigInt();
-    explicit BigInt(int64_t);
+    explicit BigInt(int64_t value);
     explicit BigInt(const std::string&);
-    void putAt(size_t index, uint64_t number);
     void display() const;
+    void displayHex() const;
+    [[nodiscard]] std::string toHexString() const;
+    void operator+= (const BigInt &other);
     BigInt operator+ (const BigInt &other) const;
-
 };
 
 #endif //RSA_BIGINT_H
