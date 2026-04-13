@@ -14,7 +14,7 @@ class BigInt {
 
 public:
     std::deque<uint64_t> number;
-    bool isNegative;
+    bool isNegative{};
     [[nodiscard]] static std::string uint64ToHex(const uint64_t &number);
 
     BigInt();

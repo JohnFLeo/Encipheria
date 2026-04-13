@@ -12,11 +12,13 @@
 BigInt::BigInt() = default;
 
 BigInt::BigInt(const int64_t value) {
+    isNegative=false;
     number.push_back(value);
 }
 
-BigInt::BigInt(const std::string &) {
-
+BigInt::BigInt(const std::string &str) {
+    isNegative=false;
+    setNumber(str);
 }
 
 void BigInt::display() const {
@@ -61,8 +63,6 @@ void BigInt::setNumber(const std::string &str) {
         leftNumber = str.substr(i,16);
         number.push_back(getUint64(leftNumber));
     }
-
-
 }
 
 
