@@ -73,6 +73,17 @@ int testBigInt() {
 /// @return error code
 int main() {
     //return testReadFile();
-    testBigInt();
+    //testBigInt();
+    const std::string aAsStr= "1fffffffffffffffffffffffffffffffff";
+    const std::string bAsStr= "fffffffffff";
+    //std::cout<< aAsStr <<std::endl;
+    const size_t offset = aAsStr.size()%16;
+
+    auto a = BigInt();
+    a.setNumber(aAsStr);
+    auto b = BigInt();
+    b.setNumber(bAsStr);
+    a+=b;
+    //a+=b;
 }
 
