@@ -155,14 +155,7 @@ void addAB(BigInt &a, const BigInt &b) {
 /// This is performed by individual adding and keeping track of overflows
 /// @param other the other operand
 void BigInt::operator+=(const BigInt &other) {
-    std::cout << " ";
-    displayHex();
-    std::cout << "+";
-    other.displayHex();
-    std::cout << "====================\n";
     addAB(*this ,other);
-
-    //std::cout << "====================\n";
     std::cout << " ";
     displayHex();
     display();
@@ -173,4 +166,20 @@ BigInt BigInt::operator+(const BigInt &other) const {
     BigInt result = *this;
     result+=other;
     return result;
+}
+
+
+/// The multiplication works by splitting the 2 number of length n in two parts
+/// ((a1<<n/2)+a0) * ((b1<<n/2))
+/// Then 3 products are calculated
+/// a1 * b1 = c2
+/// a0 * b0 = c1
+/// (a1 + a0)*(b1+b0) = c0
+/// Die folgende Formel setzt diese Teilprodukte zu einem gesamten zusammen
+/// (c2<<n) + ((c0-c1-c2)<<n/2) + c1
+/// @param other
+void BigInt::operator*=(const BigInt &other) {
+    //split the two numbers so that the "lower" section has a chunklength that is a power of 2
+    //if the two numbers have different sizes then the bigger number determines the splitting index
+    //the splitting is done by using iterators
 }
