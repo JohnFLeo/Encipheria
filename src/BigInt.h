@@ -20,13 +20,16 @@ public:
     BigInt();
     explicit BigInt(int64_t value);
     explicit BigInt(const std::string&);
+    explicit BigInt( size_t end,size_t start, const BigInt &source);
     void display() const;
     void displayHex() const;
     [[nodiscard]] std::string toHexString() const;
     static uint64_t getUint64(const std::string &str);
     void setNumber(const std::string&);
+    BigInt getRange(size_t start, size_t end) const;
     void operator+= (const BigInt &other);
     BigInt operator+ (const BigInt &other) const;
+    BigInt operator* (const BigInt &other) const;
 };
 
 #endif //RSA_BIGINT_H

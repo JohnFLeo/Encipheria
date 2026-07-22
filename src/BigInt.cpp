@@ -5,6 +5,7 @@
 #include "BigInt.h"
 
 #include <algorithm>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <ostream>
@@ -20,7 +21,17 @@ BigInt::BigInt(const std::string &str) {
     isNegative=false;
     setNumber(str);
 }
-
+BigInt::BigInt( const size_t end, const size_t start, const BigInt &source){
+    if (end < start) {
+        number.clear();
+        number.push_back(0);
+        isNegative=false;
+        return;
+    }
+    const std::deque<uint64_t> range(&source.number[start], &source.number[end]);
+    number = range;
+    isNegative=source.isNegative;
+}
 void BigInt::display() const {
     for (size_t i = 0; i<number.size(); i++) {
         std::cout<<i <<"[" << number.at(i)<<"] ";
@@ -64,6 +75,8 @@ void BigInt::setNumber(const std::string &str) {
         number.push_back(getUint64(leftNumber));
     }
 }
+
+
 
 /* Case: a.size < b.size
  * a = [ a0 ] [ a1 ]
@@ -178,8 +191,20 @@ BigInt BigInt::operator+(const BigInt &other) const {
 /// Die folgende Formel setzt diese Teilprodukte zu einem gesamten zusammen
 /// (c2<<n) + ((c0-c1-c2)<<n/2) + c1
 /// @param other
-void BigInt::operator*=(const BigInt &other) {
+BigInt BigInt::operator*(const BigInt &other) const{
     //split the two numbers so that the "lower" section has a chunklength that is a power of 2
     //if the two numbers have different sizes then the bigger number determines the splitting index
-    //the splitting is done by using iterators
+    auto toSplittingIdx = [](size_t s) {
+        const uint64_t nearest2power =std::ceil( std::log2(s));
+        return 1<<(nearest2power-1);
+    };
+    const size_t biggerNumberSize = number.size()>other.number.size()?number.size():other.number.size();
+    
+    const uint64_t splitIdx = toSplittingIdx(biggerNumberSize);
+    auto leftChunkA = BigInt(biggerNumberSize, splitIdx, *this);
+    auto leftChunkB = BigInt(biggerNumberSize, splitIdx, other);
+    auto rightChunkA = BigInt(splitIdx-1, 0, *this);
+    auto rightChunkB = BigInt(splitIdx-1, 0, other);
+
+    return other;
 }
