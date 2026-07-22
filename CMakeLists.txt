@@ -30,9 +30,12 @@ add_library(cipher_core
         src/BigInt.h
 )
 add_executable(cipher src/main.cpp)
+target_include_directories(cipher_core PUBLIC src)
+
 target_link_libraries(cipher PRIVATE cipher_core)
 #Define test Project structure
-add_executable(tests tests/test.cpp)
+add_executable(tests tests/test.cpp
+        tests/test_BigInt.cpp)
 target_link_libraries(tests PRIVATE cipher_core Catch2::Catch2WithMain)
 #enable discover tests
 catch_discover_tests(tests)
