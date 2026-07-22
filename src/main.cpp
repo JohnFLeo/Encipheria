@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -73,6 +74,28 @@ int testBigInt() {
 /// @return error code
 int main() {
     //return testReadFile();
-    testBigInt();
+    //testBigInt();
+    // const std::string aAsStr= "1fffffffffffffffffffffffffffffffff";
+    // const std::string bAsStr= "fffffffffff";
+    //
+    //
+    // auto a = BigInt(aAsStr);
+    // auto b = BigInt(bAsStr);
+    // a+=b;
+    // a+=BigInt(1);
+
+    auto toSplittingIdx = [](size_t s) {
+        uint64_t nearest2power =std::ceil( std::log2(s));
+        return (1<<(nearest2power-1));
+    };
+    for (size_t s = 1; s<20; s++) {
+        std::cout <<s<<"\t:\t"<< toSplittingIdx(s)<<std::endl;
+    }
+    // 1                [0] -> splitting idx = 1
+    // 2             [1][0] -> splitting idx = 1
+    // 3          [2][1][0] -> splitting idx = 2
+    // 4       [3][2][1][0] -> splitting idx = 2
+    // 5    [4][3][2][1][0]
+
 }
 
