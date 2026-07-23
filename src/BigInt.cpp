@@ -124,7 +124,7 @@ void BigInt::addBlocks(const uint64_t &amount) {
 /// @return true if an addition resulted in an overflow
 bool addBIfPossible(BigInt &a, const BigInt &b, const int idxA, const int idxB) {
     if(idxA<0) {
-        a.number.push_front(b.number.at(idxB));
+        a.number.push_back(b.number.at(idxB));
         return false;
     }
     if(idxB<0) {
@@ -140,7 +140,7 @@ bool addBIfPossible(BigInt &a, const BigInt &b, const int idxA, const int idxB) 
 /// @return true if an addition resulted in an overflow
 bool addOneIfPossible(BigInt &a,  const int idxA) {
     if(idxA<0) {
-        a.number.push_front(1);
+        a.number.push_back(1);
         return false;
     }
     return __builtin_add_overflow(a.number.at(idxA),1, &a.number.at(idxA));
@@ -173,7 +173,7 @@ void addAB(BigInt &a, const BigInt &b) {
         }
         carry |= addBIfPossible(a,b,idxA,idxB);
     }
-    if(carry) a.number.push_front(1);
+    if(carry) a.number.push_back(1);
 }
 
 /// Performs an addition that is constructed by adding the corresponding entries of two BigInts
