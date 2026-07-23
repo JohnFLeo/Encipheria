@@ -9,7 +9,7 @@
 #include <iomanip>
 #include <iostream>
 #include <ostream>
-
+//region  Constructors
 BigInt::BigInt() = default;
 
 BigInt::BigInt(const int64_t value) {
@@ -32,11 +32,17 @@ BigInt::BigInt( const size_t end, const size_t start, const BigInt &source){
     number = range;
     isNegative=source.isNegative;
 }
+//endregion
+//region Printing
 void BigInt::display() const {
-    for (size_t i = 0; i<number.size(); i++) {
-        std::cout<<i <<"[" << number.at(i)<<"] ";
+    uint64_t i = number.size()-1;
+    for (auto it = number.rbegin(); it!=number.rend(); ++it, i--) {
+        std::cout<< i <<"[" << number.at(i)<<"] ";
     }
     std::cout<<std::endl;
+}
+void BigInt::displayHex() const {
+    std::cout<< toHexString(" ")<<std::endl;
 }
 std::string BigInt::uint64ToHex(const uint64_t &n) {
     std::stringstream stream;
@@ -44,17 +50,16 @@ std::string BigInt::uint64ToHex(const uint64_t &n) {
     return stream.str();
 }
 
-void BigInt::displayHex() const {
-    std::cout<< toHexString()<<std::endl;
-}
-
-std::string BigInt::toHexString() const {
+std::string BigInt::toHexString(const std::string& filler) const {
     std::string result;
-    for (unsigned long i : number) {
-        result += uint64ToHex(i) + " ";
+    for (auto it = number.rbegin(); it!=number.rend(); ++it) {
+        result += uint64ToHex(*it)+filler;
     }
     return result;
 }
+//endregion
+//region Direct block manipulation
+
 /// Converts a string in hexformat(MSB left) to a uint64_t
 /// @param str a string in hexformat(MSB left) that represents a number
 /// @returns a uint64_t that contains the value
@@ -62,22 +67,27 @@ uint64_t BigInt::getUint64(const std::string &str) {
     //std::cout << str << std::endl;
     return std::stoull(str, nullptr,16);
 }
+///Sets a new value by splitting the string in substrings of length 16 and gets the corresponding uint64
 void BigInt::setNumber(const std::string &str) {
     number.clear();
     const size_t offset = str.size()%16;
     std::string leftNumber;
+    //If the size of the string doesn't fit perfectly in the 16 long substrings
     if(offset!=0) {
         leftNumber = str.substr(0,offset);
-        number.push_back(getUint64(leftNumber));
+        number.push_front(getUint64(leftNumber));
     }
     for (size_t i = offset; i < str.size(); i+=16) {
         leftNumber = str.substr(i,16);
-        number.push_back(getUint64(leftNumber));
+        number.push_front(getUint64(leftNumber));
     }
 }
 
-
-
+void BigInt::addBlocks(const uint64_t &amount) {
+    number.resize(number.size()+amount,0);
+}
+//endregion
+//region Arithmetic
 /* Case: a.size < b.size
  * a = [ a0 ] [ a1 ]
  * b = [ b0 ] [ b1 ] [ b2 ] [ b3 ] [ b4 ]
@@ -101,6 +111,8 @@ void BigInt::setNumber(const std::string &str) {
  *
  * when an addition is performed the carry if present is collected and returned
  */
+
+
 /// adds two entries and cleans invalid inputs
 /// - if idxA is invalid then a is extended in the front
 /// - if idxB is invalid then nothing needs to be done
@@ -169,10 +181,6 @@ void addAB(BigInt &a, const BigInt &b) {
 /// @param other the other operand
 void BigInt::operator+=(const BigInt &other) {
     addAB(*this ,other);
-    std::cout << " ";
-    displayHex();
-    display();
-    std::cout << std::endl;
 }
 
 BigInt BigInt::operator+(const BigInt &other) const {
@@ -192,19 +200,6 @@ BigInt BigInt::operator+(const BigInt &other) const {
 /// (c2<<n) + ((c0-c1-c2)<<n/2) + c1
 /// @param other
 BigInt BigInt::operator*(const BigInt &other) const{
-    //split the two numbers so that the "lower" section has a chunklength that is a power of 2
-    //if the two numbers have different sizes then the bigger number determines the splitting index
-    auto toSplittingIdx = [](size_t s) {
-        const uint64_t nearest2power =std::ceil( std::log2(s));
-        return 1<<(nearest2power-1);
-    };
-    const size_t biggerNumberSize = number.size()>other.number.size()?number.size():other.number.size();
-    
-    const uint64_t splitIdx = toSplittingIdx(biggerNumberSize);
-    auto leftChunkA = BigInt(biggerNumberSize, splitIdx, *this);
-    auto leftChunkB = BigInt(biggerNumberSize, splitIdx, other);
-    auto rightChunkA = BigInt(splitIdx-1, 0, *this);
-    auto rightChunkB = BigInt(splitIdx-1, 0, other);
-
-    return other;
+    return BigInt(0);
 }
+//endregion
