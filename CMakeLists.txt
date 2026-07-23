@@ -5,10 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #Add Coverage setting
 option(ENABLE_COVERAGE "Enable code coverage measurement" OFF)
+#For using coverage one needs gcovr
 if(ENABLE_COVERAGE)
-    # -O0: Deaktiviert Optimierungen, damit die Zeilen im Bericht exakt stimmen
-    # -g:  Fügt Debug-Symbole hinzu
-    # --coverage: Aktiviert die Code-Coverage-Instrumentierung (für GCC/Clang)
+    # -O0: deactivate optimizing, so that the lines in the reports line up
+    # -g:  adds debug symbols
+    # --coverage: activate the Code-Coverage (for GCC/Clang)
     add_compile_options(-O0 -g --coverage)
     add_link_options(--coverage)
 endif()
@@ -19,10 +20,10 @@ include(FetchContent)
 FetchContent_Declare(
         Catch2
         GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-        GIT_TAG        v3.15.2 # or a later release
+        GIT_TAG        v3.15.2
 )
 FetchContent_MakeAvailable(Catch2)
-#Activate CMake support for Catch
+#Activate CMake support for Catch g
 include(Catch)
 #Define main Project structure
 add_library(cipher_core
