@@ -73,8 +73,8 @@ TEST_CASE("BigInt basic arithmetic operations", "[BigInt][math]") {
         REQUIRE(c.number[0]==0);
         REQUIRE(c.number[1]==3);
     }
-    SECTION("Addition two blocks each with overflow") {
-        std::cout<<"===[Addition two blocks each with overflow]==="<<std::endl;
+    SECTION("Addition with overflow") {
+        std::cout<<"===[Addition with overflow]==="<<std::endl;
         BigInt a(UINT64_MAX);
         BigInt b(1);
         std::cout<<"a:\t";
@@ -86,6 +86,21 @@ TEST_CASE("BigInt basic arithmetic operations", "[BigInt][math]") {
         c.display();
         REQUIRE(c.number[0]==0);
         REQUIRE(c.number[1]==1);
+    }
+    SECTION("Addition with overflow that ripples through") {
+        std::cout<<"===[Addition with overflow that ripples through]==="<<std::endl;
+        BigInt a(UINT64_MAX);
+        BigInt b(std::string(32, 'f'));
+        std::cout<<"a:\t";
+        a.display();
+        std::cout<<"b:\t";
+        b.display();
+        auto c = a+b;
+        std::cout<<"c = a+b:\t";
+        c.display();
+        REQUIRE(c.number[0]==UINT64_MAX -1);
+        REQUIRE(c.number[1]==0);
+        REQUIRE(c.number[2]==1);
     }
 }
 TEST_CASE("BigInt edge cases and exception handling", "[BigInt][exceptions]") {

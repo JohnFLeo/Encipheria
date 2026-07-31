@@ -88,49 +88,26 @@ void BigInt::addBlocks(const uint64_t &amount) {
 }
 //endregion
 //region Arithmetic
-/* Case: a.size < b.size
- * a = [ a0 ] [ a1 ]
- * b = [ b0 ] [ b1 ] [ b2 ] [ b3 ] [ b4 ]
- * idxA starts at size of a minus one and gets smaller the bigger i gets (analog for idxB)
- * idxA and idxB are the same distance away from their ending
- * example:
- *   i = 1 -> a[idxA] = [ a0 ], b[idxB] = [ b3 ]
- *   i = 3 -> a[idxA] =  null , b[idxB] = [ b1 ] etc.
- *
- * after i = 2: idxA < 0 and thus the number b[idxB] is inserted at the front of a
- *
- * Case: a.size >= b.size
- * a = [ a0 ] [ a1 ] [ a2 ] [ a3 ] [ a4 ]
- * b = [ b0 ] [ b1 ]
- * before i = 2: idxB >  0 and thus an addition is performed
- * example:
- *   i = 1 -> a[idxA] = a[idxA] + b[idxB] =[ a3 ]+ [ b0 ]
- * after  i = 2: idxB <= 0 and thus
- * example:
- *   i = 3 -> a[idxA] = a[idxA] + null] =[ a3 ]+ 0
- *
- * when an addition is performed the carry if present is collected and returned
- */
+
 
 
 /// adds two entries and cleans invalid inputs
-/// - if idxA is invalid then a is extended in the front
-/// - if idxB is invalid then nothing needs to be done
+/// - if a[idx] contains no number, then the value of b[idx] is pasted there
+/// - if b[idx] contains no number, 0 is added thus nothing happens
 /// - if both indexes are valid a normal addition is performed
 /// @param a number that receives the result and acts as operand
 /// @param b other operand
-/// @param idxA index points to value that should be added (can be less than 0)
-/// @param idxB index points to value that should be added (can be less than 0)
+/// @param idx index that points to the values that should be added
 /// @return true if an addition resulted in an overflow
-bool addBIfPossible(BigInt &a, const BigInt &b, const int idxA, const int idxB) {
-    if(idxA<0) {
-        a.number.push_back(b.number.at(idxB));
+bool addBIfPossible(BigInt &a, const BigInt &b, const int idx) {
+    if(idx>=a.number.size()) {
+        a.number.push_back(b.number.at(idx));
         return false;
     }
-    if(idxB<0) {
+    if(idx>=b.number.size()) {
         return false;
     }
-    return __builtin_add_overflow(a.number.at(idxA),b.number.at(idxB), &a.number.at(idxA));
+    return __builtin_add_overflow(a.number.at(idx),b.number.at(idx), &a.number.at(idx));
 }
 /// adds 1 to an entry and cleans invalid inputs
 /// - if idxA is invalid then a is extended in the front
@@ -139,25 +116,20 @@ bool addBIfPossible(BigInt &a, const BigInt &b, const int idxA, const int idxB) 
 /// @param idxA index points to value that should be added (can be less than 0)
 /// @return true if an addition resulted in an overflow
 bool addOneIfPossible(BigInt &a,  const int idxA) {
-    if(idxA<0) {
+    if(idxA>=a.number.size()) {
         a.number.push_back(1);
         return false;
     }
     return __builtin_add_overflow(a.number.at(idxA),1, &a.number.at(idxA));
 }
 
-/// The addition is performed by iterating over all indexes of the number with a higher length
-/// Two indexes are used to keep track of the numbers that should be added together
-/// - idxA starts at size of a minus one and gets smaller the bigger i gets (analog for idxB)
-/// - idxA and idxB are the same distance away from their numbers ending
+/// The addition is performed by iterating over all indexes of the number with greater length
 /// - example:
 ///  @code
-///  a = [ a0 ] [ a1 ]
-///  b = [ b0 ] [ b1 ] [ b2 ] [ b3 ] [ b4 ]
-///   i = 1 -> a[idxA] = [ a0 ], b[idxB] = [ b3 ]
-///   i = 3 -> a[idxA] =  null , b[idxB] = [ b1 ] etc.
+///  a =                      [ a1 ] [ a0 ]
+///  b = [ b4 ] [ b3 ] [ b2 ] [ b2 ] [ b1 ]
 ///  @endcode
-/// - adding is performed by helper methods that catch the possible negative indexes
+/// - adding is performed by helper methods that catch the possible out of range indexes
 /// - if a carry happened during one iteration an additional 1 is added to the number
 /// - at the end if a carry is still present it is written into a new number that gets inserted at the front
 /// @param a receives the result of the addition and acts as an operand
@@ -166,12 +138,10 @@ void addAB(BigInt &a, const BigInt &b) {
     const size_t bigger = std::max( a.number.size(),b.number.size() );
     bool carry = false;
     for (int i = 0; i < bigger; i++) {
-        const int idxA = static_cast<int>(a.number.size())-1-i;
-        const int idxB = static_cast<int>(b.number.size())-1-i;
         if (carry) {
-            carry = addOneIfPossible(a,idxA);
+            carry = addOneIfPossible(a,i);
         }
-        carry |= addBIfPossible(a,b,idxA,idxB);
+        carry |= addBIfPossible(a,b,i);
     }
     if(carry) a.number.push_back(1);
 }
@@ -198,7 +168,7 @@ BigInt BigInt::operator+(const BigInt &other) const {
 /// (a1 + a0)*(b1+b0) = c0
 /// Die folgende Formel setzt diese Teilprodukte zu einem gesamten zusammen
 /// (c2<<n) + ((c0-c1-c2)<<n/2) + c1
-/// @param other
+/// @param other the second operand
 BigInt BigInt::operator*(const BigInt &other) const{
     return BigInt(0);
 }
